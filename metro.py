@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 from yattag import Doc
 
 # create some variables
@@ -12,6 +13,7 @@ list_south = []
 # Get JSON data
 data_north = json.loads(requests.get(url_north).text)
 data_south = json.loads(requests.get(url_south).text)
+time = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 # loop through data and append to a list
 for item in data_north['items']:
@@ -25,10 +27,12 @@ for item in data_south['items']:
 # Output prediction to terminal
 print('The next northbound bus will arrive in: ', min(list_north))
 print('The next southbound bus will arrive in: ', min(list_south))
+print('last fetched: '+ time)
 
 # Create contents of html file
 doc, tag, text = Doc().tagtext()
 doc.asis('<META HTTP-EQUIV="refresh" CONTENT="30">')
+# time = datetime.now()
 with tag('center'):
     text('The next northbound bus will arrive in: ')
     with tag('h1'):
@@ -36,9 +40,10 @@ with tag('center'):
     text('The next southbound bus will arrive in: ')
     with tag('h1'):
         text(min(list_south))
+    with tag('small'):
+        text(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
 # generate the html file
 file = open('index.html', 'w')
 file.write(doc.getvalue())
 file.close()
-
